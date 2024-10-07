@@ -34,8 +34,6 @@ from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node
 
-WORKSPACENAME = 'doosan_ws'
-
 def generate_launch_description():
 
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
@@ -45,15 +43,12 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
         launch_arguments={
-            #'gz_args': '-r sensors_demo.sdf'
             'gz_args': '-r ' + descp_path + '/description/visual_servoing.sdf'
 
 
         }.items(),
     )
 
-
-    # RQt
     rqt = Node(
         package='rqt_image_view',
         executable='rqt_image_view',
@@ -61,24 +56,11 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('rqt'))
     )
 
-    # ######################################################################
-    # # RViz
-    # pkg_ros_gz_sim_demos = get_package_share_directory('ros_gz_sim_demos')
-
-    # rviz = Node(
-    #     package='rviz2',
-    #     executable='rviz2',
-    #     arguments=[
-    #         '-d', os.path.join(pkg_ros_gz_sim_demos, 'rviz', 'rgbd_camera_bridge.rviz')
-    #     ],
-    #     condition=IfCondition(LaunchConfiguration('rviz'))
-    # )
-    # ######################################################################
 
     bridge = Node(
         package='ros_gz_image',
         executable='image_bridge',
-        arguments=['rgbd_camera/image', 'rgbd_camera/depth_image'],     #rgbd키메라만 사용
+        arguments=['rgbd_camera/image', 'rgbd_camera/depth_image'],
         output='screen'
     )
 
@@ -87,18 +69,9 @@ def generate_launch_description():
         DeclareLaunchArgument('rqt', default_value='true',
                               description='Open RQt.'),
 
-        # ###################################################
-        # DeclareLaunchArgument('rviz', default_value='true',
-        #                       description='Open RViz.'),
-        # ###################################################
-
-
         DeclareLaunchArgument('image_topic', default_value='/camera',
                               description='Topic to start viewing in RQt.'),
         bridge,
         rqt,
 
-        # ####
-        # rviz
-        # ####
     ])
